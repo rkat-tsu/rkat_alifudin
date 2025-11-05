@@ -1,0 +1,73 @@
+<?php
+
+// app/Models/RkatDetail.php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class RkatDetail extends Model
+{
+    use HasFactory;
+
+    protected $primaryKey = 'id_rkat_detail';
+
+    protected $fillable = [
+        'id_header',
+        'kode_akun',
+        'id_program',
+        'id_indikator',
+        'deskripsi_kegiatan',
+        'latar_belakang',
+        'rasional',
+        'tujuan',
+        'mekanisme',
+        'jadwal_pelaksanaan',
+        'lokasi_pelaksanaan',
+        'keberlanjutan',
+        'pjawab',
+        'target',
+        'jenis_kegiatan',
+        'dokumen_pendukung',
+        'anggaran',
+        'jenis_pencairan',
+        'nama_bank',
+        'nomor_rekening',
+        'atas_nama',
+    ];
+
+    protected $casts = [
+        'anggaran' => 'decimal:2',
+        'dokumen_pendukung' => 'array', // Jika disimpan sebagai JSON di database
+        'waktu_pelaksanaan' => 'date',
+    ];
+
+    // Relasi ke RkatHeader
+    public function rkatHeader()
+    {
+        return $this->belongsTo(RkatHeader::class, 'id_header', 'id_header');
+    }
+
+    // Relasi ke RincianAnggaran
+    public function rincianAnggaran()
+    {
+        return $this->belongsTo(RincianAnggaran::class, 'kode_anggaran', 'kode_anggaran');
+    }
+    
+    // Relasi ke ProgramKerja
+    public function programKerja()
+    {
+        return $this->belongsTo(ProgramKerja::class, 'id_program', 'id_proker');
+    }
+    // Relasi ke IndikatorKeberhasilan
+    public function indikatorKeberhasilan()
+    {
+        return $this->belongsTo(IndikatorKeberhasilan::class, 'id_indikator', 'id_indikator');
+    }
+
+    public function rabItems()
+    {
+        return $this->hasMany(RkatRabItem::class, 'id_rkat_detail', 'id_rkat_detail');
+    }
+}
