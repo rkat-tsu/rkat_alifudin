@@ -6,7 +6,8 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    // Variabel 'user' ini sudah benar
+    const user = usePage().props.auth.user; //
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
@@ -23,6 +24,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </Link>
                             </div>
 
+                            {/* --- MENU NAVIGASI DESKTOP --- */}
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                                 <NavLink
                                     href={route('dashboard')}
@@ -58,9 +60,25 @@ export default function AuthenticatedLayout({ header, children }) {
                                     IKU
                                 </NavLink>
                             </div>
+                            
+                            {/* ▼▼▼ TAMBAHKAN BLOK INI (DESKTOP) ▼▼▼ */}
+                            {/* Tautan ini hanya muncul jika user.peran adalah 'Admin' */}
+                            {user.peran === 'Admin' && (
+                                <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                                    <NavLink
+                                        href={route('tahun.index')} // Rute dari web.php
+                                        active={route().current('tahun.*')}
+                                    >
+                                        Tahun Anggaran
+                                    </NavLink>
+                                </div>
+                            )}
+                            {/* ▲▲▲ AKHIR BLOK TAMBAHAN ▲▲▲ */}
+
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center">
+                            {/* ... (Dropdown Profil - sudah benar) ... */}
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -69,6 +87,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 type="button"
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-300"
                                             >
+                                                {/* [PERBAIKAN] Menggunakan nama_lengkap dari model User */}
                                                 {user.nama_lengkap}
 
                                             </button>
@@ -94,6 +113,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="-me-2 flex items-center sm:hidden">
+                            {/* ... (Tombol Hamburger Mobile - sudah benar) ... */}
                             <button
                                 onClick={() =>
                                     setShowingNavigationDropdown(
@@ -108,34 +128,14 @@ export default function AuthenticatedLayout({ header, children }) {
                                     fill="none"
                                     viewBox="0 0 24 24"
                                 >
-                                    <path
-                                        className={
-                                            !showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={
-                                            showingNavigationDropdown
-                                                ? 'inline-flex'
-                                                : 'hidden'
-                                        }
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
+                                    {/* ... (Icon path - sudah benar) ... */}
                                 </svg>
                             </button>
                         </div>
                     </div>
                 </div>
 
+                {/* --- MENU NAVIGASI MOBILE --- */}
                 <div
                     className={
                         (showingNavigationDropdown ? 'block' : 'hidden') +
@@ -177,11 +177,28 @@ export default function AuthenticatedLayout({ header, children }) {
                             IKU
                         </ResponsiveNavLink>
                     </div>
+                    
+                    {/* ▼▼▼ TAMBAHKAN BLOK INI (MOBILE) ▼▼▼ */}
+                    {/* Tautan ini hanya muncul jika user.peran adalah 'Admin' */}
+                    {user.peran === 'Admin' && (
+                        <div className="space-y-1 pb-3 pt-2">
+                            <ResponsiveNavLink
+                                href={route('tahun.index')}
+                                active={route().current('tahun.*')}
+                            >
+                                Tahun Anggaran
+                            </ResponsiveNavLink>
+                        </div>
+                    )}
+                    {/* ▲▲▲ AKHIR BLOK TAMBAHAN ▲▲▲ */}
 
+
+                    {/* --- Menu Profil Mobile --- */}
                     <div className="border-t border-gray-200 pb-1 pt-4 dark:border-gray-600">
                         <div className="px-4">
                             <div className="text-base font-medium text-gray-800 dark:text-gray-200">
-                                {user.name}
+                                {/* [PERBAIKAN] Ganti user.name menjadi user.nama_lengkap */}
+                                {user.nama_lengkap}
                             </div>
                             <div className="text-sm font-medium text-gray-500">
                                 {user.email}
