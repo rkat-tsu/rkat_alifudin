@@ -79,7 +79,7 @@ Setelah melakukan migrasi dengan seeder (`--seed`), gunakan kredensial berikut u
 
 | Kredensial | Detail |
 | :--- | :--- |
-| **Email** | `admin@rkat.tsu.ac.id` |
+| **Email** | `admin.rkat@tsu.ac.id` |
 | **Password** | `password123` |
 
 > **Catatan:** Disarankan untuk segera mengganti password default ini melalui menu profil setelah Anda berhasil login.
