@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Passwords\CanResetPassword; // WAJIB untuk fitur reset password
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 // Import Notifikasi kustom yang telah Anda buat
 use App\Notifications\ResetPasswordNotification; 

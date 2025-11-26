@@ -8,7 +8,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\TahunAnggaranController;
 use App\Http\Controllers\DashboardController; 
 use App\Http\Controllers\MonitoringController;
-use App\Http\Controllers\UserController; // <-- [DIUBAH] 1. Tambahkan ini
+use App\Http\Controllers\UserController; // Pastikan ini ada
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,7 +16,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'), // <-- Nanti kita akan nonaktifkan ini
+        'canRegister' => Route::has('register'),
         'laravelVersion' => Application::VERSION,
         'phpVersion' => PHP_VERSION,
     ]);
@@ -27,7 +27,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Semua rute yang memerlukan otentikasi
+// === SEMUA RUTE YANG MEMERLUKAN LOGIN (ROLE APAPUN) ===
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // === RUTE MONITORING RKAT ===
@@ -50,32 +50,36 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/approval/approve/{rkatHeader}', [ApprovalController::class, 'approve'])->name('approver.approve');
 });
 
-// ▼▼▼ [DIUBAH] 2. GRUP RUTE KHUSUS ADMIN ▼▼▼
+// === GRUP RUTE KHUSUS ADMIN ===
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // === RUTE MASTER DATA (TAHUN ANGGARAN) ===
-    // [DIUBAH] Dilindungi oleh Gate 'manage-settings'
+    // 1. MASTER DATA (TAHUN ANGGARAN)
+    // Dilindungi oleh Gate 'manage-settings'
     Route::middleware('can:manage-settings')->group(function () {
         Route::resource('tahun', TahunAnggaranController::class)
             ->only(['index', 'create', 'store', 'edit', 'update', 'destroy'])
-            ->parameters(['tahun' => 'tahun']) // <-- Ini untuk Route Model Binding Anda
+            ->parameters(['tahun' => 'tahun']) // Penting untuk Route Model Binding
             ->names('tahun');
     });
 
-    // === RUTE MANAJEMEN USER (BARU) ===
-    // [DIUBAH] Dilindungi oleh Gate 'manage-users'
+    // 2. MANAJEMEN USER / AKUN
+    // Dilindungi oleh Gate 'manage-users'
     Route::middleware('can:manage-users')->group(function () {
+        // Rute Dasar (Lihat & Buat)
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
         Route::post('/users', [UserController::class, 'store'])->name('users.store');
-        // (Nanti tambahkan edit, update, delete di sini)
+        
+        // [TAMBAHAN PENTING] Rute Edit, Update, & Hapus
+        // Ini wajib ada agar tombol Edit/Hapus di Frontend berfungsi
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
     
 });
-// ▲▲▲ AKHIR BLOK ▲▲▲
 
-
-// Rute Profil (Biarkan terpisah, karena bukan hanya untuk Admin)
+// Rute Profil (Untuk semua user)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
