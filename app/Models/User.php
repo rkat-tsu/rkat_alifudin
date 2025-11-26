@@ -6,23 +6,18 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Auth\Passwords\CanResetPassword; // WAJIB untuk fitur reset password
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-// Import Notifikasi kustom yang telah Anda buat
-use App\Notifications\ResetPasswordNotification; 
-// Jika model Departemen berada di namespace yang sama atau di App\Models
-use App\Models\Departemen; 
+use App\Notifications\ResetPasswordNotification;
+use App\Models\Unit; 
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, CanResetPassword; // Tambahkan CanResetPassword
+    use HasFactory, Notifiable, CanResetPassword;
 
-    protected $table = 'users'; // Nama tabel sudah sesuai
-    protected $primaryKey = 'id_user'; // Kunci utama sudah sesuai
+    protected $table = 'users';
+    protected $primaryKey = 'id_user';
     
-    // Kolom yang dapat diisi
     protected $fillable = [
         'username',
         'email', 
@@ -30,47 +25,26 @@ class User extends Authenticatable implements MustVerifyEmail
         'nama_lengkap',
         'peran',
         'id_unit',
-        'is_aktif',
-        'nomor_telepon',
+        'is_aktif', // Pastikan kolom ini ada di sini
+        'no_telepon',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_aktif' => 'boolean', // Pastikan casting ini ada
+    ];
     
-    /**
-     * Mengganti notifikasi reset password bawaan Laravel.
-     *
-     * @param string $token Token reset password yang dihasilkan Laravel.
-     * @return void
-     */
     public function sendPasswordResetNotification($token): void
     {
-        // Panggil notifikasi kustom, passing $token dan instance model ($this).
         $this->notify(new ResetPasswordNotification($token, $this));
     }
 
-    // --- Relasi Lainnya (Contoh) ---
-    
     public function isAdmin(): bool
     {
         return $this->peran === 'Admin';
@@ -88,7 +62,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function unit(): BelongsTo
     {
-        // id_unit di tabel users merujuk ke id_unit di tabel unit
         return $this->belongsTo(Unit::class, 'id_unit', 'id_unit');
     }
 }

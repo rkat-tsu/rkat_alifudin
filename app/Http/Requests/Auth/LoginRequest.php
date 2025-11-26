@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User; // Tambahkan ini
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash; // Tambahkan ini
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -41,7 +43,11 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // 1. Cari user berdasarkan email
+        $user = User::where('email', $this->input('email'))->first();
+
+        // 2. Cek apakah user ada DAN password-nya benar
+        if (! $user || ! Hash::check($this->input('password'), $user->password)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -49,6 +55,19 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // 3. [LOGIKA BARU] Cek Status Aktif/Nonaktif
+        // Jika is_aktif bernilai false/0, tolak login
+        if (! $user->is_aktif) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
+            ]);
+        }
+
+        // 4. Jika lolos semua cek di atas, baru Login-kan user secara manual
+        Auth::login($user, $this->boolean('remember'));
+        
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -8,7 +8,7 @@ import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
-import Checkbox from '@/Components/Checkbox'; // Pastikan komponen Checkbox ada
+import Checkbox from '@/Components/Checkbox';
 
 export default function Edit({ auth, user, roles, units }) {
     const { data, setData, patch, processing, errors, reset } = useForm({
@@ -16,7 +16,8 @@ export default function Edit({ auth, user, roles, units }) {
         email: user.email,
         peran: user.peran,
         id_unit: user.id_unit || '',
-        is_aktif: Boolean(user.is_aktif),
+        // Konversi nilai 1/0 dari DB menjadi true/false untuk React Checkbox
+        is_aktif: user.is_aktif === 1 || user.is_aktif === true, 
         password: '',
         password_confirmation: '',
     });
@@ -47,7 +48,6 @@ export default function Edit({ auth, user, roles, units }) {
                         
                         <form onSubmit={submit} className="space-y-6">
                             
-                            {/* Nama Lengkap */}
                             <div>
                                 <InputLabel htmlFor="nama_lengkap" value="Nama Lengkap" />
                                 <TextInput
@@ -59,7 +59,6 @@ export default function Edit({ auth, user, roles, units }) {
                                 <InputError message={errors.nama_lengkap} className="mt-2" />
                             </div>
 
-                            {/* Email */}
                             <div>
                                 <InputLabel htmlFor="email" value="Email" />
                                 <TextInput
@@ -72,7 +71,6 @@ export default function Edit({ auth, user, roles, units }) {
                                 <InputError message={errors.email} className="mt-2" />
                             </div>
 
-                            {/* Peran */}
                             <div>
                                 <InputLabel htmlFor="peran" value="Peran" />
                                 <SelectInput
@@ -88,7 +86,6 @@ export default function Edit({ auth, user, roles, units }) {
                                 <InputError message={errors.peran} className="mt-2" />
                             </div>
 
-                            {/* Unit */}
                             <div>
                                 <InputLabel htmlFor="id_unit" value="Unit Kerja" />
                                 <SelectInput
@@ -105,8 +102,8 @@ export default function Edit({ auth, user, roles, units }) {
                                 <InputError message={errors.id_unit} className="mt-2" />
                             </div>
 
-                            {/* Status Aktif */}
-                            <div className="block">
+                            {/* CHECKBOX STATUS AKTIF */}
+                            <div className="block mt-4">
                                 <label className="flex items-center">
                                     <Checkbox
                                         name="is_aktif"
@@ -121,7 +118,6 @@ export default function Edit({ auth, user, roles, units }) {
                             <hr className="border-gray-200 dark:border-gray-700" />
                             <p className="text-sm text-gray-500">Kosongkan password jika tidak ingin menggantinya.</p>
 
-                            {/* Password (Optional) */}
                             <div>
                                 <InputLabel htmlFor="password" value="Password Baru" />
                                 <TextInput

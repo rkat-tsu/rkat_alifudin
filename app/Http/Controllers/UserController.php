@@ -63,17 +63,15 @@ class UserController extends Controller
             'peran' => $request->peran,
             'id_unit' => $request->id_unit,
             'password' => Hash::make($request->password),
-            'is_aktif' => true,
+            'is_aktif' => true, 
             'email_verified_at' => now(),
         ]);
 
         return Redirect::route('users.index')->with('success', 'Akun berhasil dibuat!');
     }
 
-    // ▼▼▼ TAMBAHAN UNTUK EDIT (SOLUSI ERROR ANDA) ▼▼▼
     public function edit(User $user): Response
     {
-        // Ambil data unit untuk dropdown
         $units = Unit::select('id_unit', 'nama_unit')->orderBy('nama_unit')->get();
 
         return Inertia::render('Admin/User/Edit', [
@@ -83,7 +81,6 @@ class UserController extends Controller
         ]);
     }
 
-    // ▼▼▼ TAMBAHAN UNTUK UPDATE ▼▼▼
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -91,19 +88,22 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id_user, 'id_user')],
             'peran' => ['required', Rule::in($this->getNonAdminRoles())],
             'id_unit' => 'nullable|exists:unit,id_unit',
-            'is_aktif' => 'required|boolean',
+            // Validasi boolean agar aman
+            'is_aktif' => 'boolean', 
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $user->fill([
-            'nama_lengkap' => $request->nama_lengkap,
-            'email' => $request->email,
-            'peran' => $request->peran,
-            'id_unit' => $request->id_unit,
-            'is_aktif' => $request->is_aktif,
-        ]);
+        // 1. Update data teks biasa
+        $user->nama_lengkap = $request->nama_lengkap;
+        $user->email = $request->email;
+        $user->peran = $request->peran;
+        $user->id_unit = $request->id_unit;
 
-        // Hanya update password jika diisi
+        // 2. [PERBAIKAN UTAMA] Paksa ambil sebagai boolean
+        // Ini akan menangkap nilai true/false dari frontend dengan benar
+        $user->is_aktif = $request->boolean('is_aktif');
+
+        // 3. Update password hanya jika diisi
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
@@ -113,7 +113,6 @@ class UserController extends Controller
         return Redirect::route('users.index')->with('success', 'Akun berhasil diperbarui!');
     }
 
-    // ▼▼▼ TAMBAHAN UNTUK DELETE ▼▼▼
     public function destroy(User $user)
     {
         if ($user->id_user === Auth::id()) {
