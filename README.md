@@ -41,7 +41,7 @@ cd sistem-rkat
 composer install
 ```
 
-### 2. Konfigurasi LingkunganSalin file lingkungan dan buat kunci aplikasi:
+### 2. Konfigurasi Lingkungan Salin file lingkungan dan buat kunci aplikasi:
 
 ``` bash
 cp .env.example .env
@@ -50,12 +50,12 @@ php artisan key:generate
 
 CATATAN: Edit file .env dan sesuaikan parameter DB_CONNECTION, DB_DATABASE, DB_USERNAME, dan DB_PASSWORD sesuai konfigurasi lokal Anda.
 
-### 3. Migrasi Database
+### 3. Migrasi Database & Seeder
 
-Gunakan perintah ini untuk membuat semua tabel dan relasi yang diperlukan.⚠️ PERHATIAN: Perintah ini akan menghapus semua data yang ada di database Anda sebelum membuat skema baru.
+Gunakan perintah ini untuk membuat semua tabel dan mengisi data awal (termasuk akun Admin default). ⚠️ Perintah ini akan menghapus semua data lama di database Anda.
 
 ``` Bash
-php artisan migrate:fresh
+php artisan migrate:fresh --seed
 ```
 ### 4. Instalasi & Kompilasi Aset Frontend
 
@@ -73,6 +73,16 @@ Aplikasi sekarang siap dijalankan. Anda dapat mengaksesnya di browser Anda, bias
 ```Bash
 php artisan serve
 ```
+## 🔐 Akses Login Default
+
+Setelah melakukan migrasi dengan seeder (`--seed`), gunakan kredensial berikut untuk masuk sebagai **Super Admin**:
+
+| Kredensial | Detail |
+| :--- | :--- |
+| **Email** | `admin@rkat.tsu.ac.id` |
+| **Password** | `password123` |
+
+> **Catatan:** Disarankan untuk segera mengganti password default ini melalui menu profil setelah Anda berhasil login.
 
 ## 🗃️ Struktur Data Inti
 
@@ -83,6 +93,7 @@ Skema ini adalah inti dari Sistem RKAT dan relasi antar tabelnya:
 | `rkat_details` | **Item Baris Anggaran/Kegiatan** (dapat banyak). | **FK** `id_header` (One-to-Many ke `rkat_headers`) |
 | `penggunas` | Menyimpan **data user dan peran** (Inputer, Kaprodi, WR, dll.). | **FK** ke tabel `departemens` (Relasi dibuat terpisah) |
 | `log_persetujuans` | Mencatat **riwayat persetujuan** dan catatan reviewer. | **FK** `id_header` (ke `rkat_headers`), **FK** `id_approver` (ke `penggunas`) |
+
 
 ## 🧑‍💻 Tim Kontributor
 
