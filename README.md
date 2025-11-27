@@ -73,14 +73,6 @@ Aplikasi sekarang siap dijalankan. Anda dapat mengaksesnya di browser Anda, bias
 ```Bash
 php artisan serve
 ```
-## 🔐 Akses Login Default
-
-Setelah melakukan migrasi dengan seeder (`--seed`), gunakan kredensial berikut untuk masuk sebagai **Super Admin**:
-
-| Kredensial | Detail |
-| :--- | :--- |
-| **Email** | `admin.rkat@tsu.ac.id` |
-| **Password** | `password123` |
 
 > **Catatan:** Disarankan untuk segera mengganti password default ini melalui menu profil setelah Anda berhasil login.
 
